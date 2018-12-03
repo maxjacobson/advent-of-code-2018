@@ -8,9 +8,7 @@ use std::collections::HashMap;
 type Point = (usize, usize);
 type Count = usize;
 
-#[derive(Debug)]
 struct Claim {
-    id: String,
     x: usize,
     y: usize,
     width: usize,
@@ -23,16 +21,13 @@ impl Claim {
             static ref DESCRIPTION_REGEX: Regex =
                 Regex::new(r"^(#\d+) @ (\d+),(\d+): (\d+)x(\d+)$").unwrap();
         }
-
         let caps = DESCRIPTION_REGEX.captures(description).unwrap();
-        let id = caps.get(1).unwrap().as_str().to_string();
         let x = caps.get(2).unwrap().as_str().parse().unwrap();
         let y = caps.get(3).unwrap().as_str().parse().unwrap();
         let width = caps.get(4).unwrap().as_str().parse().unwrap();
         let height = caps.get(5).unwrap().as_str().parse().unwrap();
 
         Claim {
-            id,
             x,
             y,
             width,

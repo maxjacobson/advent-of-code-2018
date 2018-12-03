@@ -9,6 +9,7 @@ type Point = (usize, usize);
 type Count = usize;
 
 struct Claim {
+    id: String,
     x: usize,
     y: usize,
     width: usize,
@@ -22,12 +23,14 @@ impl Claim {
                 Regex::new(r"^(#\d+) @ (\d+),(\d+): (\d+)x(\d+)$").unwrap();
         }
         let caps = DESCRIPTION_REGEX.captures(description).unwrap();
+        let id = caps.get(1).unwrap().as_str().to_string();
         let x = caps.get(2).unwrap().as_str().parse().unwrap();
         let y = caps.get(3).unwrap().as_str().parse().unwrap();
         let width = caps.get(4).unwrap().as_str().parse().unwrap();
         let height = caps.get(5).unwrap().as_str().parse().unwrap();
 
         Claim {
+            id,
             x,
             y,
             width,
@@ -43,7 +46,7 @@ fn main() {
 
     let mut claims_counter: HashMap<Point, Count> = HashMap::new();
 
-    for claim in claims {
+    for claim in claims.clone() {
         for x in (claim.x)..(claim.x + claim.width) {
             for y in (claim.y)..(claim.y + claim.height) {
                 *claims_counter.entry((x, y)).or_insert(0) += 1
@@ -51,7 +54,21 @@ fn main() {
         }
     }
 
-    let result = claims_counter.values().filter(|v| *v >= &2).count();
+    for claim in claims {
+        let mut all_good = true;
 
-    println!("Result: {}", result);
+        'xes: for x in (claim.x)..(claim.x + claim.width) {
+            for y in (claim.y)..(claim.y + claim.height) {
+                if claims_counter.get(&(x, y)) != Some(&1) {
+                    all_good = false;
+                    break 'xes;
+                }
+            }
+        }
+
+        if all_good {
+            println!("Result: {}", claim.id);
+            break;
+        }
+    }
 }

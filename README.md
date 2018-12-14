@@ -5,3 +5,5 @@ Just my solutions :)
 For rust solutions, use `cargo run`.
 
 For elm solutions, use `elm reactor`.
+
+For ruby solutions, use `ruby app.rb`.

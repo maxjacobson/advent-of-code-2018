@@ -76,14 +76,10 @@ class SleepyTime
     self
   end
 
-  def sleepiest_guard
-    sorted = data.sort_by { |guard, times| sum(times) }
-    # binding.irb
-    sorted.last.first
-  end
+  def sleepiest_pair
+    possibility = possibilities.max_by(&:frequency)
 
-  def sleepiest_minute(guard)
-    data[guard].sort_by(&:last).last.first
+    [possibility.guard, possibility.minute]
   end
 
   private
@@ -93,6 +89,18 @@ class SleepyTime
   def sum(times)
     times.values.inject(&:+)
   end
+
+  Possibility = Struct.new(:guard, :minute, :frequency)
+
+  def possibilities
+    Enumerator.new do |yielder|
+      data.each do |guard, breakdown|
+        breakdown.each do |minute, frequency|
+          yielder.yield Possibility.new(guard, minute, frequency)
+        end
+      end
+    end
+  end
 end
 
 events = input.lines.map { |line| Event.new(line.chomp) }.sort
@@ -101,9 +109,6 @@ sleepy_time = events.inject(SleepyTime.new) do |data, event|
   data.handle(event)
 end
 
-sleepiest_guard = sleepy_time.sleepiest_guard
-puts "sleepiest guard: #{sleepiest_guard}"
-sleepiest_minute = sleepy_time.sleepiest_minute(sleepiest_guard)
-puts "sleepiest minute: #{sleepiest_minute}"
+guard_id, minute = sleepy_time.sleepiest_pair
 
-puts "Result: #{sleepiest_minute * sleepiest_guard}"
+puts "Result: #{guard_id * minute}"
